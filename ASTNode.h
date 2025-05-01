@@ -417,7 +417,7 @@ public:
     typedef std::vector<PycRef<ASTNode>> values_t;
 
     ASTConstMap(PycRef<ASTNode> keys, const values_t& values)
-        : ASTNode(NODE_CONST_MAP), m_keys(std::move(keys)), m_values(std::move(values)) { }
+        : ASTNode(NODE_CONST_MAP), m_keys(std::move(keys)), m_values(values) { }
 
     const PycRef<ASTNode>& keys() const { return m_keys; }
     const values_t& values() const { return m_values; }
@@ -577,6 +577,8 @@ public:
 
     PycRef<ASTNode> cond() const { return m_cond; }
     bool negative() const { return m_negative; }
+
+    void setCond(PycRef<ASTNode> cond) { m_cond = std::move(cond); }
 
 private:
     PycRef<ASTNode> m_cond;

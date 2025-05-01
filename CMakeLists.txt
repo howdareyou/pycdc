@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.12)
 project(pycdc)
+if(MSVC)
+    add_compile_options(/utf-8)
+    # Alternatively, you can use:
+    # add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,11 +24,12 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-error=shadow -Werror ${CMAKE_CXX_FLAGS}")
 elseif(MSVC)
-    set(CMAKE_CXX_FLAGS "/WX ${CMAKE_CXX_FLAGS}")
+    # set(CMAKE_CXX_FLAGS "/WX ${CMAKE_CXX_FLAGS}")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
 
 add_library(pycxx STATIC
     bytecode.cpp
@@ -70,11 +76,14 @@ target_link_libraries(pycdas pycxx)
 install(TARGETS pycdas
     RUNTIME DESTINATION bin)
 
+
 add_executable(pycdc pycdc.cpp ASTree.cpp ASTNode.cpp)
-target_link_libraries(pycdc pycxx)
+target_link_libraries(pycdc PRIVATE pycxx ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog/spdlog.lib)
+target_compile_definitions(pycdc PUBLIC SPDLOG_COMPILED_LIB)
 
 install(TARGETS pycdc
     RUNTIME DESTINATION bin)
+
 
 find_package(Python3 3.6 COMPONENTS Interpreter)
 if(Python3_FOUND)
@@ -83,3 +92,4 @@ if(Python3_FOUND)
         WORKING_DIRECTORY "$<TARGET_FILE_DIR:pycdc>")
     add_dependencies(check pycdc)
 endif()
+

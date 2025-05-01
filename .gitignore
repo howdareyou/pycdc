@@ -6,3 +6,7 @@
 /.kdev4
 __pycache__
 tests-out
+/.vs
+/build
+/out
+/3rdparty
