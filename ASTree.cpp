@@ -562,16 +562,17 @@ void ParseSource(PycBuffer& source, PycRef<PycCode> code, PycModule* mod, ASTBlo
         {
             PycRef<ASTNode> kw = stack.top();
             stack.pop();
-            int kwparams = (operand & 0xFF00) >> 8;
-            int pparams = (operand & 0xFF);
+            PycSimpleSequence::value_t kwparam_keys = kw.cast<ASTObject>()->object().cast<PycTuple>()->values();
+
+            int kwparams = kwparam_keys.size();
+            int pparams = operand - kwparams;
             ASTCall::kwparam_t kwparamList;
             ASTCall::pparam_t pparamList;
             for (int i = 0; i < kwparams; i++) {
                 PycRef<ASTNode> val = stack.top();
                 stack.pop();
-                PycRef<ASTNode> key = stack.top();
-                stack.pop();
-                kwparamList.push_front(std::make_pair(key, val));
+                PycRef<ASTObject> key = new ASTObject(kwparam_keys[i]);
+                kwparamList.push_front(std::make_pair(key.cast<ASTNode>(), val));
             }
             for (int i = 0; i < pparams; i++) {
                 pparamList.push_front(stack.top());
@@ -581,7 +582,6 @@ void ParseSource(PycBuffer& source, PycRef<PycCode> code, PycModule* mod, ASTBlo
             stack.pop();
 
             PycRef<ASTNode> call = new ASTCall(func, pparamList, kwparamList);
-            call.cast<ASTCall>()->setKW(kw);
             stack.push(call);
         }
         break;
