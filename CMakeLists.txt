@@ -78,7 +78,7 @@ install(TARGETS pycdas
 
 
 add_executable(pycdc pycdc.cpp ASTree.cpp ASTNode.cpp)
-target_link_libraries(pycdc PRIVATE pycxx ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog/spdlog.lib)
+target_link_libraries(pycdc PRIVATE pycxx ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/spdlog/libspdlog.a)
 target_compile_definitions(pycdc PUBLIC SPDLOG_COMPILED_LIB)
 
 install(TARGETS pycdc
